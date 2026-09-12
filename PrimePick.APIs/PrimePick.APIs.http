@@ -1,0 +1,6 @@
+@PrimePick.APIs_HostAddress = http://localhost:5015
+
+GET {{PrimePick.APIs_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###
