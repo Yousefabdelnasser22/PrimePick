@@ -30,7 +30,7 @@ namespace PrimePick.Service.Services.Cart
         {
             if (id is null)
             {
-                Result<Core.Models.Cart>.Failure("Invalid Id");
+               return Result<Core.Models.Cart>.Failure("Invalid Id");
             }
             var cart = await cartRepository.GetCartAsync(id);
 

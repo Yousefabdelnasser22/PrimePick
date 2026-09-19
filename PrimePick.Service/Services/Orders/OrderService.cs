@@ -1,8 +1,10 @@
-﻿using PrimePick.Core.Models;
+﻿using Org.BouncyCastle.Bcpg;
+using PrimePick.Core.Models;
 using PrimePick.Core.Models.orders;
 using PrimePick.Core.Repository.Contract;
 using PrimePick.Core.Services.Contract;
 using PrimePick.Core.Specifications.Orders;
+using PrimePick.Repository.Repositories;
 using PrimePick.Service.Common;
 using System;
 using System.Collections.Generic;
@@ -12,7 +14,7 @@ using System.Threading.Tasks;
 
 namespace PrimePick.Service.Services.Orders
 {
-    public class OrderService(ICartService cartService , IUnitOfWork unitOfWork , IGetCurrentUserService getCurrentUserService) : IOrderService
+    public class OrderService(ICartService cartService , IUnitOfWork unitOfWork , IGetCurrentUserService getCurrentUserService , IPaymentService paymentService) : IOrderService
     {
         public async Task<Result<Order>> CreateOrderAsync(string cartId,int deliveryMethod,Address shippingAddress)
         {
@@ -80,13 +82,28 @@ namespace PrimePick.Service.Services.Orders
                 item => item.Price * item.Quantity
             );
 
+
+            // todo
+
+            if (!string.IsNullOrEmpty(cart.PaymentIntentId))
+            {
+                var spec = new OrderSpecificationWithPaymentIntentId(cart.PaymentIntentId);
+                var ExOrder = await unitOfWork.Repository<Order, int>().GetByIdAsyncWithSpecs(spec);
+                unitOfWork.Repository<Order, int>().Delete(ExOrder);
+            }
+            var cartt = await paymentService.CreateOrUpdatePaymentIntentIdAsync(cartId);
+
+
+          
             var order = new Order()
             {
                 BuyerEmail = buyerEmail,
                 DeliveryMethod = dMethod,
                 ShippingAddress = shippingAddress,
                 Items = orderItems,
-                SubTotal = subTotal
+                SubTotal = subTotal,
+                PaymentIntentId = cartt.Value.PaymentIntentId,
+                
             };
 
             await unitOfWork

@@ -14,6 +14,7 @@ using PrimePick.Repository.Repositories;
 using PrimePick.Service.Services.Cart;
 using PrimePick.Service.Services.Identity;
 using PrimePick.Service.Services.Orders;
+using PrimePick.Service.Services.Payment;
 using PrimePick.Service.Services.Products;
 using StackExchange.Redis;
 using System.Text;
@@ -76,6 +77,7 @@ namespace PrimePick.APIs.Helper
             services.AddScoped<ICartRepository,CartRepository>();
             services.AddScoped<ICartService, CartService>();
             services.AddScoped<IOrderService, OrderService>();
+            services.AddScoped<IPaymentService, PaymentService>();
 
 
             services.AddSingleton<IConnectionMultiplexer>((serviceProvider) =>
